@@ -6,7 +6,12 @@ class InvoicesController < ApplicationController
     def index
         status = params[:status]
 
-        invoices = Invoice.includes(:borrower).where(status_condition(status))
+        page_number = params[:page_number].to_i || 1
+        per_page = params[:per_page].to_i || 10
+
+        offset = (page_number - 1) * per_page
+
+        invoices = Invoice.includes(:borrower).where(status_condition(status)).offset(offset).limit(per_page)
 
         render json: InvoiceSerializer.new(
             invoices
